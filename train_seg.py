@@ -13,7 +13,7 @@ def main(opt):
     model.info()
 
     # 实例分割训练
-    results = model.train(data='E:/MDFNet/ultralytics\cfg\datasets\coco128-seg.yaml',epochs=15,imgsz=640,  workers=8, batch=8)
+    results = model.train(data='E:/MDFNet/ultralytics\cfg\datasets\coco128-seg.yaml',epochs=150,imgsz=640,  workers=8, batch=8)
 
 def parse_opt(known=False):
     parser = argparse.ArgumentParser()
