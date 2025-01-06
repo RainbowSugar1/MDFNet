@@ -21,7 +21,7 @@ project: # (str, optional) project name
 name: # (str, optional) experiment name, results saved to 'project/name' directory
 exist_ok: False # (bool) whether to overwrite existing experiment
 pretrained: True # (bool | str) whether to use a pretrained model (bool) or a model to load weights from (str)
-optimizer: Adam # (str) optimizer to use, choices=[SGD, Adam, Adamax, AdamW, NAdam, RAdam, RMSProp, auto]
+optimizer: auto # (str) optimizer to use, choices=[SGD, Adam, Adamax, AdamW, NAdam, RAdam, RMSProp, auto]
 verbose: True # (bool) whether to print verbose output
 seed: 0 # (int) random seed for reproducibility
 deterministic: True # (bool) whether to enable deterministic mode
@@ -87,8 +87,8 @@ workspace: 4 # (int) TensorRT: workspace size (GB)
 nms: False # (bool) CoreML: add NMS
 
 # Hyperparameters ------------------------------------------------------------------------------------------------------
-lr0: 0.01 # (float) initial learning rate (i.e. SGD=1E-2, Adam=1E-3)
-lrf: 0.01 # (float) final learning rate (lr0 * lrf)
+lr0: 0.003 # (float) initial learning rate (i.e. SGD=1E-2, Adam=1E-3)
+lrf: 0.1 # (float) final learning rate (lr0 * lrf)
 momentum: 0.937 # (float) SGD momentum/Adam beta1
 weight_decay: 0.0005 # (float) optimizer weight decay 5e-4
 warmup_epochs: 3.0 # (float) warmup epochs (fractions ok)
@@ -113,7 +113,7 @@ flipud: 0.0 # (float) image flip up-down (probability)
 fliplr: 0.5 # (float) image flip left-right (probability)
 bgr: 0.0 # (float) image channel BGR (probability)
 mosaic: 1.0 # (float) image mosaic (probability)
-mixup: 0.0 # (float) image mixup (probability)
+mixup: 1.0  # (float) image mixup (probability)
 copy_paste: 0.0 # (float) segment copy-paste (probability)
 auto_augment: randaugment # (str) auto augmentation policy for classification (randaugment, autoaugment, augmix)
 erasing: 0.4 # (float) probability of random erasing during classification training (0-0.9), 0 means no erasing, must be less than 1.0.

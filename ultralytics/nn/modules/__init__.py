@@ -1,8 +1,26 @@
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+"""
+Ultralytics modules.
 
+Example:
+    Visualize a module with Netron.
+    ```python
+    from ultralytics.nn.modules import *
+    import torch
+    import os
+
+    x = torch.ones(1, 128, 40, 40)
+    m = Conv(128, 128)
+    f = f'{m._get_name()}.onnx'
+    torch.onnx.export(m, x, f)
+    os.system(f'onnxslim {f} {f} && open {f}')  # pip install onnxslim
+    ```
+"""
 
 from .block import (
     C1,
     C2,
+    C2PSA,
     C3,
     C3TR,
     CIB,
@@ -21,7 +39,9 @@ from .block import (
     C2f,
     C2fAttn,
     C2fCIB,
+    C2fPSA,
     C3Ghost,
+    C3k2,
     C3x,
     CBFuse,
     CBLinear,
@@ -69,7 +89,14 @@ from .transformer import (
 
 
 
-from .CoreV8.Backbone.MobileViTv3 import CPNMViTBv3, CSCMViTBv3, ReNLANMViTBv3, C3_MViTBv3, C2f_MViTBv3
+
+from .CoreV8.Backbone.MobileViTv3 import CTMViTBv3, CSCMViTBv3, ReNLANMViTBv3, C3_MViTBv3, C2f_MViTBv3
+
+
+
+
+
+
 
 
 
@@ -80,7 +107,9 @@ __all__ = (
     "Conv",
     "Conv2",
     #------------------
-    "CPNMViTBv3", "CSCMViTBv3", "ReNLANMViTBv3", "C3_MViTBv3", "C2f_MViTBv3",
+
+    "CTMViTBv3", "CSCMViTBv3", "ReNLANMViTBv3", "C3_MViTBv3", "C2f_MViTBv3",
+
     "SPPELAN","RepNCSPELAN4","ADown",
 
 
@@ -109,6 +138,9 @@ __all__ = (
     "C2",
     "C3",
     "C2f",
+    "C3k2",
+    "C2fPSA",
+    "C2PSA",
     "C2fAttn",
     "C3x",
     "C3TR",

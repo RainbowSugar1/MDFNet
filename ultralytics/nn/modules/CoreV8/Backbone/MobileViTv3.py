@@ -308,7 +308,7 @@ class Bottleneck(nn.Module):
     def forward(self, x):
         return x + self.cv2(self.cv1(x)) if self.add else self.cv2(self.cv1(x))
 ################# 
-class CPNMViTBv3(nn.Module):
+class CTMViTBv3(nn.Module):
     def __init__(self, c1, c2, n=1, extra=2, shortcut=True, g=1, e=0.5):
         super().__init__()
         self.c = int(c2 * e)  #self.c用于调整中间通道数

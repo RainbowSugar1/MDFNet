@@ -1,4 +1,4 @@
-# Ultralytics YOLO 🚀, AGPL-3.0 license
+
 
 import contextlib
 from copy import deepcopy
@@ -11,6 +11,7 @@ from ultralytics.nn.modules import (
     AIFI,
     C1,
     C2,
+    C2PSA,
     C3,
     C3TR,
     ELAN1,
@@ -26,7 +27,9 @@ from ultralytics.nn.modules import (
     C2f,
     C2fAttn,
     C2fCIB,
+    C2fPSA,
     C3Ghost,
+    C3k2,
     C3x,
     CBFuse,
     CBLinear,
@@ -56,17 +59,47 @@ from ultralytics.nn.modules import (
     WorldDetect,
     v10Detect,
 )
-from ultralytics.nn.modules import CPNMViTBv3, CSCMViTBv3, ReNLANMViTBv3, C3_MViTBv3, C2f_MViTBv3
+
+
+
+
+
+
+
+
+from ultralytics.nn.modules import CTMViTBv3, CSCMViTBv3, ReNLANMViTBv3, C3_MViTBv3, C2f_MViTBv3
+
+
+
+
+
 from ultralytics.nn.modules import SPPELAN, RepNCSPELAN4, ADown
-from ultralytics.nn.modules.CoreV8.Conv.dodconv import DODConv
+
+
+
+# 另外一种方式
+
+# from ultralytics.nn.modules.CoreV8.ALL.msfm import MSFM, LAE
+# from ultralytics.nn.modules.CoreV8.ALL.RFAC import RFAConv
+
+from ultralytics.nn.modules.CoreV8.Conv.dodconv import DOWConv
+
+
+
+
+
+from ultralytics.nn.modules.CoreV8.ALL.MAF import Stem,ConvWrapper,AVG_down, CSPDepthResELAN, MPRep, SimConvWrapper, CSPRepResELAN, RepELANMSv2, CSPSDepthResELAN, SDepthMP, RepHDW, RepELANMS,RepELANMS2
+
+
 from ultralytics.nn.modules import (
 
     CBAM,
 
+
     SCDown,
     C2fCIB,
-    PSA,
-    v10Detect
+    PSA
+
 )
 
 
@@ -896,6 +929,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
     import ast
 
     # Args
+    legacy = True
     max_channels = float("inf")
     nc, act, scales = (d.get(x) for x in ("nc", "activation", "scales"))
     depth, width, kpt_shape = (d.get(x, 1.0) for x in ("depth_multiple", "width_multiple", "kpt_shape"))
@@ -932,12 +966,15 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             GhostBottleneck,
             SPP,
             SPPF,
+            C2fPSA,
+            C2PSA,
             DWConv,
             Focus,
             BottleneckCSP,
             C1,
             C2,
             C2f,
+            C3k2,
             RepNCSPELAN4,
             ELAN1,
             ADown,
@@ -965,9 +1002,14 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
                 )  # num heads
 
             args = [c1, c2, *args[1:]]
-            if m in {BottleneckCSP, C1, C2, C2f, C2fAttn, C3, C3TR, C3Ghost, C3x, RepC3, C2fCIB}:
+            if m in {BottleneckCSP, C1, C2, C2f,C3k2, C2fAttn, C3, C3TR, C3Ghost, C3x, RepC3, C2fPSA,C2fCIB,C2PSA,}:
                 args.insert(2, n)  # number of repeats
                 n = 1
+            if m is C3k2:  # for M/L/X sizes
+                legacy = False
+                if scale in "mlx":
+                    args[3] = True
+
         elif m is AIFI:
             args = [ch[f], *args]
         elif m in {HGStem, HGBlock}:
@@ -979,20 +1021,42 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
         elif m is ResNetLayer:
             c2 = args[1] if args[3] else args[1] * 4
         # ----------------------------新增代码----------------------
+
+        elif m in [CSPDepthResELAN,CSPRepResELAN, CSPSDepthResELAN, SDepthMP, RepHDW, RepELANMS,RepELANMS2]:
+            c1, c2 = ch[f], args[0]
+            args = [c1, c2, *args[1:]]
+            args.insert(2, n)  # number of repeats
+            n = 1
+        elif m in [RepELANMSv2]:
+            c1, c2 = ch[f], args[0]
+            args = [c1, c2, *args[1:]]
+        elif m in [Stem,ConvWrapper, SimConvWrapper]:
+            c1 = ch[f]
+            c2 = args[0]
+            args = [c1, c2, *args[1:]]
+        elif m in [AVG_down]:
+            c1 = ch[f]
+            c2 = c1
+        elif m in [MPRep]:
+            c1 = ch[f]
+            c2 = args[0]
+            c2 = make_divisible(min(c2, max_channels) * width, 8)
+            args = [c1, c2, *args[1:]]
+
         elif m in [ADown]:
             c1, c2 = ch[f], args[0]
             if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
                 c2 = make_divisible(min(c2, max_channels) * width, 8)
             args = [c1, c2, *args[1:]]
-        elif m in [CPNMViTBv3, CSCMViTBv3, ReNLANMViTBv3, C3_MViTBv3, C2f_MViTBv3]:
+
+        elif m in [CTMViTBv3, CSCMViTBv3, ReNLANMViTBv3, C3_MViTBv3, C2f_MViTBv3]:
             c1, c2 = ch[f], args[0]
             if c2 != nc:  # if not output
                 c2 = make_divisible(min(c2, max_channels) * width, 8)
             args = [c1, c2, *args[1:]]
-            if m in [CPNMViTBv3, CSCMViTBv3, C3_MViTBv3, C2f_MViTBv3]:
+            if m in [CTMViTBv3, CSCMViTBv3, C3_MViTBv3, C2f_MViTBv3]:
                 args.insert(2, n)  # number of repeats
                 n = 1
-
 
         elif m is SPPELAN:
             c1, c2 = ch[f], args[0]
@@ -1008,11 +1072,16 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             args = [c1, c2, c3, c4, *args[3:]]
         # Attention注意力机制汇总
 
+        # elif m in (MSFM, RFAConv):
+        #     c1, c2 = ch[f], args[0]
+        #     if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
+        #         c2 = make_divisible(min(c2, max_channels) * width, 8)
+        #     args = [c1, c2, *args[1:]]
+        #     if m is MSFM:
+        #         args.insert(2, n)  # number of repeats
+        #         n = 1
 
-
-
-
-        elif m is DODConv:
+        elif m is DOWConv:
             c1, c2 = ch[f], args[0]
             if c2 != nc:  # if not output
                 c2 = make_divisible(min(c2, max_channels) * width, 8)
@@ -1037,6 +1106,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
             args = [c1, c2, *args[1:]]
         elif m is CBFuse:
             c2 = ch[f[-1]]
+
         else:
             c2 = ch[f]
         m_ = nn.Sequential(*(m(*args) for _ in range(n))) if n > 1 else m(*args)  # module

@@ -10,11 +10,11 @@ from torch.nn.parameter import Parameter
 from torch.nn.modules.module import Module
 import collections
 
-class DODConv(nn.Sequential):
+class DOWConv(nn.Sequential):
     def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, norm_layer=nn.BatchNorm2d,
             ):
         padding = (kernel_size - 1) // 2
-        super(DODConv, self).__init__(
+        super(DOWConv, self).__init__(
             DOConv2d(in_channels, out_channels, kernel_size, stride, padding, groups=in_channels,
                      ),
             norm_layer(out_channels),

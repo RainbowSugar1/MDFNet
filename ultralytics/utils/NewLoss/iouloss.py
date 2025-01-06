@@ -1,4 +1,5 @@
-
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+"""Model validation metrics."""
 
 import math
 import warnings
@@ -9,8 +10,10 @@ import numpy as np
 import torch
 
 def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, CIoU=False, EIoU=False, SIoU=False, WIoU=False, EfficiCIoU=False, XIoU=False, is_Focaler='None', eps=1e-7):
-    Inner = False
 
+
+    Inner = False
+    
     if Inner == False:
         if xywh:  # transform from xywh to xyxy
             (x1, y1, w1, h1), (x2, y2, w2, h2) = box1.chunk(4, -1), box2.chunk(4, -1)
@@ -23,10 +26,10 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
             w1, h1 = b1_x2 - b1_x1, b1_y2 - b1_y1 + eps
             w2, h2 = b2_x2 - b2_x1, b2_y2 - b2_y1 + eps
 
-
+        
         epoch = 10
         if UIoU:
-            print('UIoU')
+            print('1')
             # define the center point for scaling
             bb1_xc = x1
             bb1_yc = y1
@@ -35,7 +38,7 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
             # attenuation mode of hyperparameter "ratio"
             linear = True
             cosine = False
-            fraction = False
+            fraction = False 
             # assuming that the total training epochs are 300, the "ratio" changes from 2 to 0.5
             if linear:
                 ratio = -0.005 * epoch + 2
@@ -55,7 +58,7 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
             # CIoU = True
     # ---------------------------------------------------------------------------------------------------------------
 
-
+        
 
         # Intersection area
         inter = (b1_x2.minimum(b2_x2) - b1_x1.maximum(b2_x1)).clamp_(0) * (
@@ -83,7 +86,7 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
         inner_inter = (torch.min(inner_b1_x2, inner_b2_x2) - torch.max(inner_b1_x1, inner_b2_x1)).clamp(0) * \
                     (torch.min(inner_b1_y2, inner_b2_y2) - torch.max(inner_b1_y1, inner_b2_y1)).clamp(0)
         union = w1*ratio * h1*ratio + w2*ratio * h2*ratio - inner_inter + eps
-        print('use Inner系列')
+        print('1')
         iou = inner_inter/union
     #  --------------Inner----------------------
 
@@ -93,7 +96,7 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
     if Focaler:
         d=0.0
         u=0.95
-        print('use Focaler系列')
+        print('1')
         iou = ((iou - d) / (u - d)).clamp(0, 1)
 
     if CIoU or DIoU or GIoU or EIoU or SIoU or WIoU or EfficiCIoU or XIoU:
@@ -106,8 +109,8 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
                 v = (4 / math.pi**2) * (torch.atan(w2 / h2) - torch.atan(w1 / h1)).pow(2)
                 with torch.no_grad():
                     alpha = v / (v - iou + (1 + eps))
-                print('CIoU')
-                return iou - (rho2 / c2 + v * alpha)
+                print('1')
+                return iou - (rho2 / c2 + v * alpha)  #
             elif SIoU:
                 s_cw = (b2_x1 + b2_x2 - b1_x1 - b1_x2) * 0.5
                 s_ch = (b2_y1 + b2_y2 - b1_y1 - b1_y2) * 0.5
@@ -124,14 +127,14 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
                 omiga_w = torch.abs(w1 - w2) / torch.max(w1, w2)
                 omiga_h = torch.abs(h1 - h2) / torch.max(h1, h2)
                 shape_cost = torch.pow(1 - torch.exp(-1 * omiga_w), 4) + torch.pow(1 - torch.exp(-1 * omiga_h), 4)
-                print('SIoU')
-                return iou - 0.5 * (distance_cost + shape_cost)
+                print('1')
+                return iou - 0.5 * (distance_cost + shape_cost)#
             elif EIoU:
                 v = torch.pow(1 / (1 + torch.exp(-(w2 / h2))) - 1 / (1 + torch.exp(-(w1 / h1))), 2)
                 with torch.no_grad():
                     alpha = v / (v - iou + (1 + eps))
-                print('EIoU')
-                return iou - (rho2 / c2 + v * alpha)
+                print('')
+                return iou - (rho2 / c2 + v * alpha)#
             elif EfficiCIoU:
                 # @from MangoAI &3836712GKcH2717GhcK.
                 c2 = cw ** 2 + ch ** 2 + eps  # convex diagonal squared
@@ -144,7 +147,7 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
                 v = (4 / math.pi ** 2) * torch.pow(torch.atan(w2 / h2) - torch.atan(w1 / h1), 2)
                 with torch.no_grad():
                     alpha = v / (v - iou + (1 + eps))
-                print('EfficiCIoU')
+                print('')
                 return iou - (rho2 / c2 + w_dis/cw2+h_dis/ch2 + v * alpha)
             elif XIoU:# @from MangoAI &3836712GKcH2717GhcK.
                 c2 = cw ** 2 + ch ** 2 + eps  # convex diagonal squared
@@ -155,17 +158,28 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
                 v = torch.pow(1 / q2 - 1 / q1, 2)
                 with torch.no_grad():
                     alpha = v / (v - iou + (1 + eps)) * beta
-                print('XIoU')
+                print('1')
                 return iou - (rho2 / c2 + v * alpha)
-            print('DIoU')
-            return iou - rho2 / c2  #
+            print('1')
+            return iou - rho2 / c2
+        elif WIoU:
+            from ultralytics.utils.NewLoss.wiou import IoU_Cal
+            b1 = torch.stack([b1_x1, b1_y1, b1_x2, b1_y2], dim=-1)
+            b2 = torch.stack([b2_x1, b2_y1, b2_x2, b2_y2], dim=-1)
+
+            self = IoU_Cal(b1, b2, monotonous = False)  # monotonous set WIoUv1、WIoUv2、WIoUv3
+            loss = getattr(IoU_Cal, '1')(b1, b2, self=self)
+            iou = 1 - self.iou
+            print('')
+            return loss, iou#
         c_area = cw * ch + eps  # convex area
-        print('GIoU')
-        return iou - (c_area - union) / c_area
-    return iou
+        print('')
+        return iou - (c_area - union) / c_area  #
+    return iou  #
 
 
 def bbox_focal_multi_iou(box1, box2, xywh=True, GIoU=False, DIoU=False, CIoU=False, EIoU=False, SIoU=False, WIoU=False, FocalLoss_= 'none', eps=1e-7):
+
     if xywh:  # transform from xywh to xyxy
         (x1, y1, w1, h1), (x2, y2, w2, h2) = box1.chunk(4, -1), box2.chunk(4, -1)
         w1_, h1_, w2_, h2_ = w1 / 2, h1 / 2, w2 / 2, h2 / 2
@@ -193,7 +207,16 @@ def bbox_focal_multi_iou(box1, box2, xywh=True, GIoU=False, DIoU=False, CIoU=Fal
         if CIoU or DIoU or EIoU or SIoU:  # Distance or Complete IoU https://arxiv.org/abs/1911.08287v1
             c2 = cw**2 + ch**2 + eps  # convex diagonal squared
             rho2 = ((b2_x1 + b2_x2 - b1_x1 - b1_x2) ** 2 + (b2_y1 + b2_y2 - b1_y1 - b1_y2) ** 2) / 4  # center dist ** 2
-            if SIoU:
+            if CIoU:
+                v = (4 / math.pi**2) * (torch.atan(w2 / h2) - torch.atan(w1 / h1)).pow(2)
+                with torch.no_grad():
+                    alpha = v / (v - iou + (1 + eps))
+                if FocalLoss_ == '':
+                    print(' ')
+                    return iou - (rho2 / c2 + v * alpha), (inter/(union + eps)) ** 0.5# mg
+                print('')
+                return iou - (rho2 / c2 + v * alpha)  #
+            elif SIoU:
                 s_cw = (b2_x1 + b2_x2 - b1_x1 - b1_x2) * 0.5
                 s_ch = (b2_y1 + b2_y2 - b1_y1 - b1_y2) * 0.5
                 sigma = torch.pow(s_cw ** 2 + s_ch ** 2, 0.5)
@@ -210,8 +233,44 @@ def bbox_focal_multi_iou(box1, box2, xywh=True, GIoU=False, DIoU=False, CIoU=Fal
                 omiga_h = torch.abs(h1 - h2) / torch.max(h1, h2)
                 shape_cost = torch.pow(1 - torch.exp(-1 * omiga_w), 4) + torch.pow(1 - torch.exp(-1 * omiga_h), 4)
                 if FocalLoss_ == 'Focal_SIoU':
-                    print(' use focal-siou')
+                    print(' use focal-siou ')
                     return iou - 0.5 * (distance_cost + shape_cost), (inter/(union + eps)) ** 0.5
-                print('SIoU')
-                return iou - 0.5 * (distance_cost + shape_cost)
+                print('')
+                return iou - 0.5 * (distance_cost + shape_cost)#
+            elif EIoU:
+                w_dis=torch.pow(b1_x2-b1_x1-b2_x2+b2_x1, 2)
+                h_dis=torch.pow(b1_y2-b1_y1-b2_y2+b2_y1, 2)
+                cw2=torch.pow(cw , 2)+eps
+                ch2=torch.pow(ch , 2)+eps
+                if FocalLoss_ == '':
+                    print(' ')
+                    return iou - (rho2 / c2 + w_dis / cw2 + h_dis / ch2), (inter/(union + eps)) ** 0.5
+                print('')
+                return iou - (rho2 / c2 + w_dis / cw2 + h_dis / ch2)#
+            if FocalLoss_ == '':
+                    print(' ')
+                    return iou - rho2 / c2, (inter/(union + eps)) ** 0.5
+            print('')
+            return iou - rho2 / c2  #
+        elif WIoU:
+            from ultralytics.utils.NewLoss.wiou import IoU_Cal
+            b1 = torch.stack([b1_x1, b1_y1, b1_x2, b1_y2], dim=-1)
+            b2 = torch.stack([b2_x1, b2_y1, b2_x2, b2_y2], dim=-1)
+
+
+            self = IoU_Cal(b1, b2, monotonous = False)  # monotonous set WIoUv1、WIoUv2、WIoUv3
+            loss = getattr(IoU_Cal, 'WIoU')(b1, b2, self=self)
+            iou = 1 - self.iou
+            if FocalLoss_ == '':
+                print(' ')
+                return iou, (inter/(union + eps)) ** 0.5, loss
+            print('')
+            return loss, iou#
+        c_area = cw * ch + eps  # convex area
+        if FocalLoss_ == '':
+                print(' ')
+                return iou - (c_area - union) / c_area, (inter/(union + eps)) ** 0.5
+        print('')
+        return iou - (c_area - union) / c_area  # GIoU🚀 https://arxiv.org/pdf/1902.09630.pdf
+    return iou  #
 

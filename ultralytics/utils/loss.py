@@ -316,64 +316,8 @@ class BboxLoss(nn.Module):
             iou = bbox_iou(pred_bboxes[fg_mask], target_bboxes[fg_mask], xywh=False, CIoU=True)
             loss_iou = ((1.0 - iou) * weight).sum() / target_scores_sum
         
-        '''
-            Loss改进各类Loss：CIoU、DIoU、EIoU、GIoU、SIoU、WIoU
-            
-            support multi iou loss
-            CIoU🚀 (bool, optional): If True, calculate Complete IoU. Defaults to False. origin loss
-            GIoU🚀 (bool, optional): If True, calculate Generalized IoU. Defaults to False.
-            DIoU🚀 (bool, optional): If True, calculate Distance IoU. Defaults to False.
-            EIoU🚀 (bool, optional): If True, calculate Generalized IoU. Defaults to False.
-            SIoU🚀 (bool, optional): If True, calculate Distance IoU. Defaults to False.
-            WIoU🚀 (bool, optional): If True, calculate Complete IoU. Defaults to False.
-            PIoU🚀 (bool, optional): If True, calculate Complete IoU. Defaults to False.
-            XIoU🚀 (bool, optional): If True, calculate Complete IoU. Defaults to False.
-            EfficiCIoU🚀 (bool, optional): If True, calculate Complete IoU. Defaults to False.
-            MPDIoU🚀 (bool, optional): If True, calculate Complete IoU. Defaults to False.
-            Shape-IoU🚀 (bool, optional): If True, calculate Complete IoU. Defaults to False.
 
-        '''
-        '''
-            Inner-IoU 改进各类Loss 可以结合多种进行使用, 已经更新如下超过10+种
-            Focal_Inner_PIoU/Focal_Inner_PIoUv2
-            Focal_Inner_GIoU
-            Focal_Inner_DIoU
-            Focal_Inner_CIoU
-            Focal_Inner_EIoU
-            Focal_Inner_SIoU
-            Focal_Inner_WIoU
-            Inner_PIoU/Inner_PIoUv2
-            Inner_GIoU
-            Inner_DIoU
-            Inner_CIoU
-            Inner_EIoU
-            Inner_SIoU
-            Inner_WIoU
-            替换参数即可
-        '''
-        # iou = bbox_inner_multi_iou(pred_bboxes[fg_mask], target_bboxes[fg_mask], Inner_SIoU=True, FocalLoss_='Focal_Inner_GIoU')
-        # loss_iou = ((1.0 - iou) * weight).sum() / target_scores_sum
-        '''
-            FocalerIoU 改进各类Loss 可以结合多种进行使用, 已经更新如下超过10+种
-            Focaler_PIoU/Focaler_PIoUv2
-            Focaler_GIoU
-            Focaler_DIoU
-            Focaler_CIoU
-            Focaler_EIoU
-            Focaler_SIoU
-            Focaler_WIoU
-            Focal_Focaler_PIoU/Focal_Focaler_PIoUv2
-            Focal_Focaler_GIoU
-            Focal_Focaler_DIoU
-            Focal_Focaler_CIoU
-            Focal_Focaler_EIoU
-            Focal_Focaler_SIoU
-            Focal_Focaler_WIoU
-            替换参数即可
-        '''
-        '''
-            Focal Loss改进各类Loss：FocalCIoU、FocalDIoU、FocalEIoU、FocalGIoU、FocalSIoU、FocalWIoU、Focal_PIoU、Focal_PIoUv2、
-        '''
+
 
         # DFL loss
         if self.dfl_loss:
