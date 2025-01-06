@@ -14,6 +14,8 @@ MViTBv3 (see Figure 3B), as the core submodule, combines standard convolution la
 Environment dependencies and core packages: windows11 system, pytorch=1.12.0, python=3.8,numpy=1.23.2,mmcv=1.6.2,timm=0.6.7, opencv-python=4.10.0.84，Run python train_seg.py --cfg ultralytics\cfg\models\cfg2024\YOLOv8-Seg\yyyy.yaml directly on the terminal to start training，The hyperparameters can be set using our default settings. If you want to use other hyperparameters, please modify them in the train_deg.py and ultralytics/cfg/defaulted.yaml files
 
 Our dataset has been shared on Baidu Cloud：https://pan.baidu.com/s/1w5RyxfPQbvZNPUNXjOLztw ，Extracted code: is3a,
+
 If you feel that the code is helpful to you, please cite our paper：“Enhanced Ship Instance Segmentation in SAR and Optical Images via MobileViT-v3 Fusion Network”Expected to be published in The Visual Computer journal
+
 If you have any questions, please contact us at：m230200742@st.shou.edu.cn;
 
