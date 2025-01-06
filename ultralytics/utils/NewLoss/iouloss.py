@@ -55,7 +55,7 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
             w1, h1, w2, h2 = ww1, hh1, ww2, hh2
             b1_x1, b1_x2, b1_y1, b1_y2 = bb1_x1, bb1_x2, bb1_y1, bb1_y2
             b2_x1, b2_x2, b2_y1, b2_y2 = bb2_x1, bb2_x2, bb2_y1, bb2_y2
-            # CIoU = True
+            
     # ---------------------------------------------------------------------------------------------------------------
 
         
@@ -92,12 +92,7 @@ def bbox_multi_iou(box1, box2, xywh=False, GIoU=False, UIoU=False, DIoU=False, C
 
 
 
-    Focaler = False
-    if Focaler:
-        d=0.0
-        u=0.95
-        print('1')
-        iou = ((iou - d) / (u - d)).clamp(0, 1)
+   
 
     if CIoU or DIoU or GIoU or EIoU or SIoU or WIoU or EfficiCIoU or XIoU:
         cw = b1_x2.maximum(b2_x2) - b1_x1.minimum(b2_x1)  # convex (smallest enclosing box) width
