@@ -19,7 +19,6 @@ Environment dependencies and core packages: windows11 system, pytorch=1.12.0, py
 
 Our dataset has been shared on Baidu Cloud：https://pan.baidu.com/s/1w5RyxfPQbvZNPUNXjOLztw ，Extracted code: is3a,
 
-If you feel that the code is helpful to you, please cite our paper：“Enhanced Ship Instance Segmentation in SAR and Optical Images via MobileViT-v3 Fusion Network”Expected to be published in The Visual Computer journal
 
 If you have any questions, please contact us at：m230200742@st.shou.edu.cn;
 
