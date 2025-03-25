@@ -166,10 +166,9 @@ class MV3Block(nn.Module):
         else:
             return self.se(self.conv(x))
 
-# ############################################
-# https://github.com/iscyy/ultralyticsPro
+
 import numpy as np
-# from ultralytics.nn.modules.block import Conv
+
 def autopad(k, p=None, d=1):  # kernel, padding, dilation
     """Pad to 'same' shape outputs."""
     if d > 1:
