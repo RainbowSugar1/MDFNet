@@ -10,6 +10,22 @@ from torch.nn.parameter import Parameter
 from torch.nn.modules.module import Module
 import collections
 
+class SEBlock(nn.Module):
+    def __init__(self, out_channels, reduction=16):
+        super(SEBlock, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.fc = nn.Sequential(
+            nn.Linear(out_channels, out_channels // reduction, bias=False),
+            nn.SiLU(),
+            nn.Linear(out_channels // reduction, out_channels, bias=False),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        b, c, _, _ = x.size()
+        y = self.avg_pool(x).view(b, c)
+        y = self.fc(y).view(b, c, 1, 1)
+        return x * y.expand_as(x)
 class DOWConv(nn.Sequential):
     def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, norm_layer=nn.BatchNorm2d,
             ):
