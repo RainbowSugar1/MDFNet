@@ -16,7 +16,7 @@ class SEBlock(nn.Module):
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
             nn.Linear(out_channels, out_channels // reduction, bias=False),
-            nn.SiLU(),
+            nn.GELU(),
             nn.Linear(out_channels // reduction, out_channels, bias=False),
             nn.Sigmoid()
         )
